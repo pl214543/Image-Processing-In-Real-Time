@@ -6,6 +6,7 @@ from tkinter import *
 from login import extrauser
 import cv2 as cv
 from PIL import Image, ImageTk
+from perspectivetransform import perspective_transform
 
 from datetime import datetime
 
@@ -61,7 +62,7 @@ label_widget = tk.Label(fen)
 label_widget.grid(row=1)
 
 # Create a frame for the video feed
-left = tk.Frame(fen, bg="grey", width=300, height=300)
+left = tk.Frame(fen, bg="grey", width=852, height=480)
 left.pack_propagate(False)
 tk.Label(left, text="Line Detection", fg="white", bg="black", anchor="center", justify="center").pack()
 left.grid(column=0, row=0, pady=5, padx=10, sticky="n")
@@ -69,6 +70,19 @@ left.grid(column=0, row=0, pady=5, padx=10, sticky="n")
 # Create a label widget to display the video feed inside the left frame
 video_label = tk.Label(left)
 video_label.pack()
+
+def edited_cam():
+    _, frame = video.read()
+    result = perspective_transform(frame)
+    opencv_image = cv.cvtColor(result, cv.COLOR_BGR2RGBA)
+    captured_image = Image.fromarray(opencv_image)
+    photo_image = ImageTk.PhotoImage(image=captured_image)
+    video_label.photo_image = photo_image
+    video_label.configure(image=photo_image)
+    video_label.after(10, edited_cam)
+
+
+edited_cam()
 
 # line
 sty = Style(fen)
@@ -104,7 +118,7 @@ logoutbutton.grid(row=3, column=2, pady=(20, 16), columnspan=2)
 
 # Bottom Left
 
-bleft = tk.Frame(fen, bg="grey", width=500, height=300)
+bleft = tk.Frame(fen, bg="grey", width=852, height=480)
 
 bleft.pack_propagate(False)
 tk.Label(bleft, text="Raw Video", fg="white", bg="black", anchor="center", justify="center").pack()
